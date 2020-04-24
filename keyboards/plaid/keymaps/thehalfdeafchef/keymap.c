@@ -62,17 +62,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* LOWER
      * ,----------------------------------------------------------------------------.
-     * |      |      | MPRV | MPLY | MNXT |     |     |     | PGUP| UP  | PGDN|PSCR |
-     * |------+------+------+------+------+-----+-----+-----+-----+-----------+-----+
-     * |      |      | MUTE | VOLD | VOLU |     |     |     | LEFT| DOWN|RIGHT|     |
-     * |------+------+------+------+------+-----+-----+-----+-----+-----+-----+-----+
-     * |      |      | MAIL | WBAK | WFWD |     |     |     | HOME|     | END |     |
-     * |------+------+------+------+------+-----+-----+-----+-----+-----------+-----+
+     * |      |      | MPRV | MPLY | MNXT |     |     | PGUP| UP  | PGDN|PSCR |     |
+     * |------+------+------+------+------+-----+-----+-----+-----------+-----++-----
+     * |      |      | MUTE | VOLD | VOLU |     |     | LEFT| DOWN|RIGHT|     |     |
+     * |------+------+------+------+------+-----+-----+-----+-----+-----+-----++-----
+     * |      |      | MAIL | WBAK | WFWD |     |     | HOME|     | END |     |     |
+     * |------+------+------+------+------+-----+-----+-----+-----------+-----++-----
      * |      |      |      |      |      |    DEL    |     |     |     |     |     |
-     * `----------------------------------------------------------------------------'
+     * `----------------------------------------------------------------------'------
      */
 
-    [_LOWER] = LAYOUT_planck_mit(KC_NO, KC_NO, KC_MPRV, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_NO, KC_PGUP, KC_UP, KC_PGDN, KC_PSCR, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, KC_NO, KC_NO, KC_LEFT, KC_DOWN, KC_RGHT, KC_NO, KC_NO, KC_NO, KC_MAIL, KC_WBAK, KC_WFWD, KC_NO, KC_NO, KC_NO, KC_HOME, KC_NO, KC_END, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_DEL, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO),
+    [_LOWER] = LAYOUT_planck_mit(KC_NO, KC_NO, KC_MPRV, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_PGUP, KC_UP, KC_PGDN, KC_PSCR, KC_NO, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, KC_NO, KC_LEFT, KC_DOWN, KC_RGHT, KC_NO, KC_NO, KC_NO, KC_NO, KC_MAIL, KC_WBAK, KC_WFWD, KC_NO, KC_NO, KC_HOME, KC_NO, KC_END, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_DEL, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO),
 
     /* RAISE
      * ,--------------------------------------------------------------------------------.
