@@ -18,7 +18,7 @@
 
 #include "quantum.h"
 
-#define XXX KC_NO
+#define KC_NO
 
 // This a shortcut to help you visually see your layout.
 // The following is an example using the Planck MIT layout
