@@ -15,4 +15,4 @@ AUDIO_ENABLE = no           # Audio output
 BLUETOOTH = AdafruitBLE
 ADAFRUIT_BLE_ENABLE = yes
 
-EXTRAFLAGS += -flto
+LTO_ENABLE = yes
