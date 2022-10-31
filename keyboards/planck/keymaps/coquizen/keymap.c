@@ -28,20 +28,15 @@ enum planck_layers {
 enum planck_keycodes { QWERTY = SAFE_RANGE };
 
 // Define a type containing as many tapdance states as you need
-typedef enum {
-    TD_NONE,
-    TD_UNKNOWN,
-    TD_SINGLE_TAP,
-    TD_SINGLE_HOLD,
-    TD_DOUBLE_TAP,
-    TD_DOUBLE_HOLD,
-    TD_DOUBLE_SINGLE_TAP
-} td_state_t;
+typedef enum { TD_NONE, TD_UNKNOWN, TD_SINGLE_TAP, TD_SINGLE_HOLD, TD_DOUBLE_SINGLE_TAP } td_state_t;
 
 typedef struct {
     bool       is_press_action;
     td_state_t state;
 } td_tap_t;
+
+// Create a global instance of the tapdance state type
+static td_tap_t al_tap_state = {.is_press_action = true, .state = TD_NONE};
 
 enum { A_LOWER };
 
@@ -51,6 +46,16 @@ td_state_t cur_dance(qk_tap_dance_state_t *state);
 // `finished` and `reset` functions for each tapdance keycode
 void altlower_finished(qk_tap_dance_state_t *state, void *user_data);
 void altlower_reset(qk_tap_dance_state_t *state, void *user_data);
+
+enum combos {
+    SUP_2,
+    SUP_3,
+};
+
+const uint16_t PROGMEM sup2_combo[] = {KC_CIRC, KC_2, COMBO_END};
+const uint16_t PROGMEM sup3_combo[] = {KC_CIRC, KC_3, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {[SUP_2] = COMBO(sup2_combo, UC(0x00B9)), [SUP_3] = COMBO(sup3_combo, UC(0x00B3))};
 
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
@@ -122,12 +127,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |------+------+------+------+------+------+------+------+------+------+------+------|
      * |      |      |MUSmod|Aud on|Audoff|AGnorm|AGswap|Qwerty|      |      |      |      |
      * |------+------+------+------+------+------+------+------+------+------+------+------|
-     * |      |Voice-|Voice+|Mus on|Musoff|MIDIon|MIDIof|Brigt-|Brigt+|      |      |      |
+     * |      |Voice-|Voice+|Mus on|Musoff|MIDIon|MIDIof|      |Brigt-|Brigt+|      |      |
      * |------+------+------+------+------+------+------+------+------+------+------+------|
      * |      |      |      |      |      |             |      |      |      |      |      |
      * `-----------------------------------------------------------------------------------'
      */
-    [_ADJUST] = LAYOUT_planck_grid(_______, QK_BOOT, DEBUG, RGB_TOG, RGB_MOD, RGB_HUI, RGB_HUD, RGB_SAI, RGB_SAD, _______, KC_PSCR, KC_DEL, _______, _______, MU_MOD, AU_ON, AU_OFF, AG_NORM, AG_SWAP, QWERTY, _______, _______, _______, _______, _______, MUV_DE, MUV_IN, MU_ON, MU_OFF, MI_ON, MI_OFF, KC_BRID, KC_BRIU, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
+    [_ADJUST] = LAYOUT_planck_grid(_______, QK_BOOT, DEBUG, RGB_TOG, RGB_MOD, RGB_HUI, RGB_HUD, RGB_SAI, RGB_SAD, _______, KC_PSCR, KC_DEL, _______, _______, MU_MOD, AU_ON, AU_OFF, AG_NORM, AG_SWAP, QWERTY, _______, _______, _______, _______, _______, MUV_DE, MUV_IN, MU_ON, MU_OFF, MI_ON, MI_OFF, _______, KC_BRID, KC_BRIU, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______),
 
     /*  NumPad (Double Tap Lower)
      *  ,-----------------------------------------------------------------------------------.
@@ -262,62 +267,56 @@ bool music_mask_user(uint16_t keycode) {
 
 td_state_t cur_dance(qk_tap_dance_state_t *state) {
     if (state->count == 1) {
-        if (state->interrupted || !state->pressed)
+        if (!state->pressed)
             return TD_SINGLE_TAP;
         else
             return TD_SINGLE_HOLD;
-    } else if (state->count == 2) {
-        if (state->interrupted) return TD_DOUBLE_SINGLE_TAP;
-        else if (state->pressed)
-            return TD_DOUBLE_HOLD;
-        else return TD_DOUBLE_TAP;
-    }
-    return TD_UNKNOWN;
+    } else if (state->count == 2)
+        return TD_DOUBLE_SINGLE_TAP;
+    else
+        return TD_UNKNOWN;
 }
 
-static td_tap_t np_tap_state = {.is_press_action = true, .state = TD_NONE};
-
-// Handle each of the possible states for tapdance keycode you define
-
 void altlower_finished(qk_tap_dance_state_t *state, void *user_data) {
-    np_tap_state.state = cur_dance(state);
-    switch (np_tap_state.state) {
+    al_tap_state.state = cur_dance(state);
+    switch (al_tap_state.state) {
         case TD_SINGLE_HOLD:
             layer_on(_LOWER);
             break;
-        case TD_DOUBLE_TAP:
+        case TD_DOUBLE_SINGLE_TAP:
+            // Check to see if the layer is already set
             if (layer_state_is(_NUMPAD)) {
-#ifdef AUDIO_ENABLE
-                PLAY_SONG(layerswitch_song);
-#endif
+                // If already set, then switch it off
                 layer_off(_NUMPAD);
-            } else {
-#ifdef AUDIO_ENABLE
                 PLAY_SONG(layerswitch_song);
-#endif
+            } else {
+                // If not already set, then switch the layer on
                 layer_on(_NUMPAD);
-            }
+                PLAY_SONG(layerswitch_song);
+            };
+            break;
         default:
             break;
     }
 }
 
 void altlower_reset(qk_tap_dance_state_t *state, void *user_data) {
-    if (np_tap_state.state == TD_SINGLE_HOLD) {
+    // If the key was held down and now is released then switch off the layer
+    if (al_tap_state.state == TD_SINGLE_HOLD) {
         layer_off(_LOWER);
     }
-    np_tap_state.state = TD_NONE;
+    al_tap_state.state = TD_NONE;
 }
 
 // Associate tap dance key with its functionality
 qk_tap_dance_action_t tap_dance_actions[] = {[A_LOWER] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, altlower_finished, altlower_reset)};
 
 // Set a long-ish tapping term for tap-dance keys
-// uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
-//     switch (keycode) {
-//         case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
-//             return 175;
-//         default:
-//             return TAPPING_TERM;
-//     }
-// }
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
+            return 275;
+        default:
+            return TAPPING_TERM;
+    }
+}
