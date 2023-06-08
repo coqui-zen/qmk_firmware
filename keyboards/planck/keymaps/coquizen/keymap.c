@@ -17,6 +17,15 @@
 #include QMK_KEYBOARD_H
 #include "muse.h"
 
+#ifdef AUDIO_ENABLE
+float layerswitch_song[][2] = SONG(PLANCK_SOUND);
+float tone_startup[][2]     = SONG(STARTUP_SOUND);
+float tone_qwerty[][2]      = SONG(QWERTY_SOUND);
+float tone_COLEMAK_VCP[][2] = SONG(COLEMAK_SOUND);
+float music_scale[][2]      = SONG(MUSIC_SCALE_SOUND);
+float tone_goodbye[][2]     = SONG(GOODBYE_SOUND);
+
+#endif
 enum planck_layers {
     _QWERTY,
     _LOWER,
@@ -41,11 +50,11 @@ static td_tap_t al_tap_state = {.is_press_action = true, .state = TD_NONE};
 enum { A_LOWER };
 
 // Function to determine the current tapdance state
-td_state_t cur_dance(qk_tap_dance_state_t *state);
+td_state_t cur_dance(tap_dance_state_t *state);
 
 // `finished` and `reset` functions for each tapdance keycode
-void altlower_finished(qk_tap_dance_state_t *state, void *user_data);
-void altlower_reset(qk_tap_dance_state_t *state, void *user_data);
+void altlower_finished(tap_dance_state_t *state, void *user_data);
+void altlower_reset(tap_dance_state_t *state, void *user_data);
 
 enum combos {
     SUP_2,
@@ -70,13 +79,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS]
 //    ├──────┼──────┼──────┼──────┼────────┼─────┼─────┼───────┼──────┼──────┼────┼──────┤
 //    │ lsft │  z   │  x   │  c   │   v    │  b  │  n  │   m   │  ,   │  .   │ /  │ ent  │
 //    ├──────┼──────┼──────┼──────┼────────┼─────┼─────┼───────┼──────┼──────┼────┼──────┤
-//    │ lctl │ lgui │ lalt │ aLGR │ TD_LWR │ spc │ spc │ RAISE │ left │ down │ up │ rght │
+//    │ lctl │ lalt │ lgui │ lLGR │ TD_LWR │ spc │ spc │ RAISE │ left │ down │ up │ rght │
 //    └──────┴──────┴──────┴──────┴────────┴─────┴─────┴───────┴──────┴──────┴────┴──────┘
 [_QWERTY] = LAYOUT_planck_grid(
   KC_TAB  , KC_Q    , KC_W    , KC_E    , KC_R   , KC_T   , KC_Y   , KC_U  , KC_I    , KC_O    , KC_P    , KC_BSPC,
   KC_ESC  , KC_A    , KC_S    , KC_D    , KC_F   , KC_G   , KC_H   , KC_J  , KC_K    , KC_L    , KC_SCLN , KC_QUOT,
   KC_LSFT , KC_Z    , KC_X    , KC_C    , KC_V   , KC_B   , KC_N   , KC_M  , KC_COMM , KC_DOT  , KC_SLSH , KC_ENT ,
-  KC_LCTL , KC_LGUI , KC_LALT , KC_ALGR , TD_LWR , KC_SPC , KC_SPC , RAISE , KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT
+  KC_LCTL , KC_LALT  , KC_LGUI  , KC_ALGR, TD_LWR , KC_SPC , KC_SPC , RAISE , KC_LEFT , KC_DOWN , KC_UP   , KC_RGHT
 ),
 
 //    ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬───────┬──────────┬─────────────┬──────┬─────┐
@@ -111,19 +120,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS]
   _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______    , KC_MUTE , KC_VOLD , KC_VOLU , _______
 ),
 
-//    ┌─────┬─────────┬────────┬─────────┬─────────┬─────────┬─────────┬─────────┬─────────┬──────┬──────┬─────┐
-//    │     │ QK_BOOT │ DEBUG  │ RGB_TOG │ RGB_MOD │ RGB_HUI │ RGB_HUD │ RGB_SAI │ RGB_SAD │      │ pscr │ del │
-//    ├─────┼─────────┼────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
-//    │     │         │ MU_MOD │  AU_ON  │ AU_OFF  │ AG_NORM │ AG_SWAP │ QWERTY  │         │      │      │     │
-//    ├─────┼─────────┼────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
-//    │     │ MUV_DE  │ MUV_IN │  MU_ON  │ MU_OFF  │  MI_ON  │ MI_OFF  │         │  bRID   │ bRIU │      │     │
-//    ├─────┼─────────┼────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
-//    │     │         │        │         │         │         │         │         │         │      │      │     │
-//    └─────┴─────────┴────────┴─────────┴─────────┴─────────┴─────────┴─────────┴─────────┴──────┴──────┴─────┘
+//    ┌─────┬─────────┬─────┬─────────┬─────────┬─────────┬─────────┬─────────┬─────────┬──────┬──────┬─────┐
+//    │     │ QK_BOOT │     │ RGB_TOG │ RGB_MOD │ RGB_HUI │ RGB_HUD │ RGB_SAI │ RGB_SAD │      │ pscr │ del │
+//    ├─────┼─────────┼─────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
+//    │     │         │     │  AU_ON  │ AU_OFF  │ AG_NORM │ AG_SWAP │ QWERTY  │         │      │      │     │
+//    ├─────┼─────────┼─────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
+//    │     │         │     │  MU_ON  │ MU_OFF  │  MI_ON  │ MI_OFF  │         │  bRID   │ bRIU │      │     │
+//    ├─────┼─────────┼─────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼──────┼──────┼─────┤
+//    │     │         │     │         │         │         │         │         │         │      │      │     │
+//    └─────┴─────────┴─────┴─────────┴─────────┴─────────┴─────────┴─────────┴─────────┴──────┴──────┴─────┘
 [_ADJUST] = LAYOUT_planck_grid(
-  _______ , QK_BOOT , DEBUG   , RGB_TOG , RGB_MOD , RGB_HUI , RGB_HUD , RGB_SAI , RGB_SAD , _______ , KC_PSCR , KC_DEL ,
-  _______ , _______ , MU_MOD  , AU_ON   , AU_OFF  , AG_NORM , AG_SWAP , QWERTY  , _______ , _______ , _______ , _______,
-  _______ , MUV_DE  , MUV_IN  , MU_ON   , MU_OFF  , MI_ON   , MI_OFF  , _______ , KC_BRID , KC_BRIU , _______ , _______,
+  _______ , QK_BOOT , _______ , RGB_TOG , RGB_MOD , RGB_HUI , RGB_HUD , RGB_SAI , RGB_SAD , _______ , KC_PSCR , KC_DEL ,
+  _______ , _______ , _______ , AU_ON   , AU_OFF  , AG_NORM , AG_SWAP , QWERTY  , _______ , _______ , _______ , _______,
+  _______ , _______ , _______ , MU_ON   , MU_OFF  , MI_ON   , MI_OFF  , _______ , KC_BRID , KC_BRIU , _______ , _______,
   _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______
 ),
 
@@ -142,7 +151,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS]
   _______ , KC_P7 , KC_P8   , KC_P9   , KC_PEQL , _______ , _______ , _______ , _______ , _______ , _______ , _______,
   _______ , KC_P0 , _______ , KC_PDOT , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______
 )
-} layer_state_t layer_state_set_user(layer_state_t state) {
+};
+
+layer_state_t layer_state_set_user(layer_state_t state) {
     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 }
 
@@ -254,7 +265,7 @@ bool music_mask_user(uint16_t keycode) {
     }
 }
 
-td_state_t cur_dance(qk_tap_dance_state_t *state) {
+td_state_t cur_dance(tap_dance_state_t *state) {
     if (state->count == 1) {
         if (!state->pressed)
             return TD_SINGLE_TAP;
@@ -266,7 +277,7 @@ td_state_t cur_dance(qk_tap_dance_state_t *state) {
         return TD_UNKNOWN;
 }
 
-void altlower_finished(qk_tap_dance_state_t *state, void *user_data) {
+void altlower_finished(tap_dance_state_t *state, void *user_data) {
     al_tap_state.state = cur_dance(state);
     switch (al_tap_state.state) {
         case TD_SINGLE_HOLD:
@@ -289,7 +300,7 @@ void altlower_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void altlower_reset(qk_tap_dance_state_t *state, void *user_data) {
+void altlower_reset(tap_dance_state_t *state, void *user_data) {
     // If the key was held down and now is released then switch off the layer
     if (al_tap_state.state == TD_SINGLE_HOLD) {
         layer_off(_LOWER);
@@ -298,7 +309,7 @@ void altlower_reset(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 // Associate tap dance key with its functionality
-qk_tap_dance_action_t tap_dance_actions[] = {[A_LOWER] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, altlower_finished, altlower_reset)};
+tap_dance_action_t tap_dance_actions[] = {[A_LOWER] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, altlower_finished, altlower_reset)};
 
 // Set a long-ish tapping term for tap-dance keys
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
