@@ -1,0 +1,29 @@
+<<<<<<<< HEAD:keyboards/gmmk/numpad/post_config.h
+/* Copyright 2022 by rustedaperture
+========
+/* Copyright 2023 DeskDaily
+>>>>>>>> master:keyboards/lxxt/config.h
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+<<<<<<<< HEAD:keyboards/gmmk/numpad/post_config.h
+#ifndef TAP_CODE_DELAY
+#    define TAP_CODE_DELAY 10
+#endif
+========
+#define WS2812_PIO_USE_PIO1
+>>>>>>>> master:keyboards/lxxt/config.h

@@ -21,6 +21,10 @@
 
 #pragma once
 
+<<<<<<<< HEAD:keyboards/smithrune/iron160/iron160_s/halconf.h
+#define HAL_USE_PWM TRUE
+========
 #define HAL_USE_SPI TRUE
+>>>>>>>> master:keyboards/smithrune/iron160/iron160_h/halconf.h
 
 #include_next <halconf.h>

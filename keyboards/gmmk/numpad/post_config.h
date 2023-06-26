@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:keyboards/mechlovin/zed65/rev1/mcuconf.h
+/* Copyright 2022 QMK
+========
 /* Copyright 2022 by rustedaperture
+>>>>>>>> master:keyboards/gmmk/numpad/post_config.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +20,14 @@
 
 #pragma once
 
+<<<<<<<< HEAD:keyboards/mechlovin/zed65/rev1/mcuconf.h
+#include_next <mcuconf.h>
+
+
+#undef STM32_SPI_USE_SPI1
+#define STM32_SPI_USE_SPI1 TRUE
+========
 #ifndef TAP_CODE_DELAY
 #    define TAP_CODE_DELAY 10
 #endif
+>>>>>>>> master:keyboards/gmmk/numpad/post_config.h
